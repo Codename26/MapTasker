@@ -1,0 +1,123 @@
+package com.codename26.maptasker;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+/**
+ * Created by Dell on 01.10.2017.
+ */
+
+public class Task implements Parcelable {
+    public static final String TABLE_NAME = "Tasks";
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_TASK_NAME = "TaskName";
+    public static final String COLUMN_TASK_DESCRIPTION = "TaskDescription";
+    public static final String COLUMN_TASK_LATITUDE = "TaskLatitude";
+    public static final String COLUMN_TASK_LONGITUDE = "TaskLongitude";
+    public static final String COLUMN_TASK_TAG = "TaskTag";
+
+
+
+    private String mTaskName;
+    private String mTaskDescription;
+    private String mTaskTag;
+    private double mTaskLatitude;
+    private double mTaskLongitude;
+    private long mTaskId;
+
+    public Task() {
+    }
+
+    public Task(String taskName, double taskLatitude, double taskLongitude) {
+        mTaskName = taskName;
+        mTaskLatitude = taskLatitude;
+        mTaskLongitude = taskLongitude;
+    }
+
+    public String getTaskName() {
+        return mTaskName;
+    }
+
+    public void setTaskName(String taskName) {
+        mTaskName = taskName;
+    }
+
+    public String getTaskDescription() {
+        return mTaskDescription;
+    }
+
+    public void setTaskDescription(String taskDescription) {
+        mTaskDescription = taskDescription;
+    }
+
+    public String getTaskTag() {
+        return mTaskTag;
+    }
+
+    public void setTaskTag(String taskTag) {
+        mTaskTag = taskTag;
+    }
+
+    public double getTaskLatitude() {
+        return mTaskLatitude;
+    }
+
+    public void setTaskLatitude(double taskLatitude) {
+        mTaskLatitude = taskLatitude;
+    }
+
+    public double getTaskLongitude() {
+        return mTaskLongitude;
+    }
+
+    public void setTaskLongitude(double taskLongitude) {
+        mTaskLongitude = taskLongitude;
+    }
+
+    public long getTaskId() {
+        return mTaskId;
+    }
+
+    public void setTaskId(long taskId) {
+        mTaskId = taskId;
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mTaskName);
+        dest.writeString(this.mTaskDescription);
+        dest.writeString(this.mTaskTag);
+        dest.writeDouble(this.mTaskLatitude);
+        dest.writeDouble(this.mTaskLongitude);
+        dest.writeLong(this.mTaskId);
+    }
+
+    protected Task(Parcel in) {
+        this.mTaskName = in.readString();
+        this.mTaskDescription = in.readString();
+        this.mTaskTag = in.readString();
+        this.mTaskLatitude = in.readDouble();
+        this.mTaskLongitude = in.readDouble();
+        this.mTaskId = in.readLong();
+    }
+
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel source) {
+            return new Task(source);
+        }
+
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
+}
+
+
