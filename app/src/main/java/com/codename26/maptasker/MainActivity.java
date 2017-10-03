@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public static final String NEW_TASK_KEY = "NewTask";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

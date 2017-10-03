@@ -49,6 +49,53 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public long newTask(){
+        long id = 0;
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(Task.COLUMN_TASK_NAME, "");
+            values.put(Task.COLUMN_TASK_DESCRIPTION, "");
+            values.put(Task.COLUMN_TASK_TAG, "");
+            values.put(Task.COLUMN_TASK_LATITUDE, 0);
+            values.put(Task.COLUMN_TASK_LONGITUDE , 0);
+
+            id = db.insert(Task.TABLE_NAME, null, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return id;
+    }
+
+    public Task getTask(long id){
+        SQLiteDatabase db = getWritableDatabase();
+        Task task = new Task();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(Task.TABLE_NAME, null, Task.COLUMN_ID + "=" + id, null, null, null, null);
+
+            if (cursor.moveToFirst()) {
+
+                    task.setTaskId(cursor.getLong(cursor.getColumnIndex(Task.COLUMN_ID)));
+                    task.setTaskName(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_NAME)));
+                    task.setTaskDescription(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_DESCRIPTION)));
+                    task.setTaskTag(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_TAG)));
+                    task.setTaskLatitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LATITUDE)));
+                    task.setTaskLongitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LONGITUDE)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return task;
+    }
+
     public ArrayList<Task> getTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();

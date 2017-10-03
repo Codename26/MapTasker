@@ -2,21 +2,17 @@ package com.codename26.maptasker;
 
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,6 +35,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     boolean longClickPressed = false;
     LatLng coordinates;
     Snackbar mSnackbar;
+    private Task task;
 
 
     public MapFragment() {
@@ -50,6 +47,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.containsKey(MainActivity.NEW_TASK_KEY)){
+            System.out.println("++++++++++++++++");
+        }
     }
 
     @Override
@@ -67,9 +68,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onClick(View view) {
             Fragment taskEditFragment = new TaskEditFragment();
+                DataBaseHelper helper = new DataBaseHelper(getActivity());
+                long id = helper.newTask();
+                Task task = new Task();
+                task.setTaskId(id);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MainActivity.NEW_TASK_KEY, task);
+                taskEditFragment.setArguments(bundle);
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragmentContainer, taskEditFragment);
-                transaction.addToBackStack(null);
+                //transaction.addToBackStack(null);
                 transaction.commit();
             }
         });
