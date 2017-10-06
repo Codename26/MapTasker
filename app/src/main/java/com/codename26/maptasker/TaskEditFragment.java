@@ -54,7 +54,7 @@ public class TaskEditFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+/*
                 Fragment mapFragment = new MapFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(MainActivity.NEW_TASK_KEY, task);
@@ -62,6 +62,10 @@ public class TaskEditFragment extends Fragment {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragmentContainer, mapFragment);
                 transaction.commit();
+                */
+if (mListener != null) {
+                    mListener.saveTask(task);
+                }
 
             }
         });
@@ -96,6 +100,15 @@ public class TaskEditFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
+    }
+
+    private SaveTaskListener mListener;
+    public void setSaveTaskListener(SaveTaskListener listener){
+        mListener = listener;
+    }
+
+    public interface SaveTaskListener {
+       void saveTask(Task task);
     }
 
 }

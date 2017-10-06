@@ -3,6 +3,7 @@ package com.codename26.maptasker;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -22,9 +23,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String NEW_TASK_KEY = "NewTask";
+    public static final String TASK_ARRAY = "TaskArray";
+    private ArrayList<Task> tasks;
+    TaskEditFragment taskEditFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +55,15 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
             MapFragment mapFragment = new MapFragment();
+            DataBaseHelper helper = new DataBaseHelper(this);
+            tasks = helper.getTasks();
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList(TASK_ARRAY, tasks);
+
             fm.beginTransaction().add(R.id.fragmentContainer, mapFragment).commit();
+
+            taskEditFragment = new TaskEditFragment();
+            taskEditFragment.setSaveTaskListener(mSaveTaskListener);
         }
 
 
@@ -111,5 +125,13 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private TaskEditFragment.SaveTaskListener mSaveTaskListener = new TaskEditFragment.SaveTaskListener() {
+        @Override
+        public void saveTask(Task task) {
+            DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
+            helper.insertTask(task);
+        }
+    };
 
 }

@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +34,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private double longitude = 30.425726;
     private GoogleMap mMap;
     FloatingActionButton fab;
+    private ArrayList<Task> tasks = new ArrayList<>();
     boolean longClickPressed = false;
     LatLng coordinates;
     Snackbar mSnackbar;
@@ -49,8 +52,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onCreate(savedInstanceState);
         Bundle arguments = getArguments();
         if (arguments != null && arguments.containsKey(MainActivity.NEW_TASK_KEY)){
-            System.out.println("++++++++++++++++");
+            task = arguments.getParcelable(MainActivity.NEW_TASK_KEY);
         }
+        if (arguments != null && arguments.containsKey(MainActivity.TASK_ARRAY)){
+            tasks = arguments.getParcelableArrayList(MainActivity.TASK_ARRAY);
+        }
+
     }
 
     @Override
@@ -117,6 +124,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void drawMap() {
         mMap.clear();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            mMap.addMarker(new MarkerOptions().position(new LatLng(task.getTaskLatitude(), task.getTaskLongitude()))
+                    .title(task.getTaskName()));
+            mMap.addCircle(new CircleOptions()
+                    .center(new LatLng(task.getTaskLatitude(), task.getTaskLongitude()))
+                    .radius(200)
+                    .strokeWidth(2)
+                    .strokeColor(Color.argb(153, 117, 200, 242))
+                    .fillColor(Color.argb(153, 117, 200, 242)));
+
+        }
+        /*
         mMap.addMarker(new MarkerOptions().position(coordinates).title("Test Title"));
         mMap.addCircle(new CircleOptions()
                 .center(new LatLng(lattitude,longitude))
@@ -124,6 +144,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 .strokeWidth(2)
                 .strokeColor(Color.argb(153, 117, 200, 242))
                 .fillColor(Color.argb(153, 117, 200, 242)));
+                */
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15.5f));
     }
 
