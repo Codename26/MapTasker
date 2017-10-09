@@ -82,6 +82,11 @@ public class Task implements Parcelable {
         mTaskId = taskId;
     }
 
+    public String toString(){
+        return String.format("Name = %s, Desc = %s, Latitude = %f, Longitude = %f",
+                mTaskName, mTaskDescription, mTaskLatitude, mTaskLongitude);
+    }
+
 
     @Override
     public int describeContents() {

@@ -23,6 +23,29 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 + Task.COLUMN_TASK_LATITUDE + " REAL NOT NULL,"
                 + Task.COLUMN_TASK_LONGITUDE + " REAL NOT NULL);");
 
+        fillDB(sqLiteDatabase);
+
+    }
+
+    private void fillDB(SQLiteDatabase sqLiteDatabase) {
+        double[] latArray = {50.516303, 50.515873, 50.515795, 50.512714};
+        double[] lonArray = {30.455847, 30.442139, 30.432531, 30.417893};
+        try {
+            for (int i = 0; i < 4; i++) {
+                ContentValues values = new ContentValues();
+                values.put(Task.COLUMN_TASK_NAME, "Task " + i );
+                values.put(Task.COLUMN_TASK_DESCRIPTION, "Desc " + i );
+                values.put(Task.COLUMN_TASK_TAG, "Tag " + i );
+                values.put(Task.COLUMN_TASK_LATITUDE, latArray[i]);
+                values.put(Task.COLUMN_TASK_LONGITUDE , lonArray[i]);
+
+                sqLiteDatabase.insert(Task.TABLE_NAME, null, values);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override
@@ -125,7 +148,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-
         return tasks;
     }
 

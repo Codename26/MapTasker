@@ -14,6 +14,7 @@
               android:name="com.google.android.gms.maps.SupportMapFragment"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:clickable = "true"
               tools:context="com.codename26.geotask.MapsActivity"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

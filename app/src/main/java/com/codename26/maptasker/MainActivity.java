@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.FragmentTransaction;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity
             tasks = helper.getTasks();
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList(TASK_ARRAY, tasks);
+            mapFragment.setArguments(bundle);
+            mapFragment.setDeleteTaskListener(mDeleteTaskListener);
 
             fm.beginTransaction().add(R.id.fragmentContainer, mapFragment).commit();
 
@@ -95,8 +98,17 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
             return true;
         }
+     /*   if (id == R.id.action_delete) {
+            Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_edit) {
+            Toast.makeText(this, "Edit", Toast.LENGTH_SHORT).show();
+            return true;
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -129,8 +141,19 @@ public class MainActivity extends AppCompatActivity
     private TaskEditFragment.SaveTaskListener mSaveTaskListener = new TaskEditFragment.SaveTaskListener() {
         @Override
         public void saveTask(Task task) {
+            if (task.getTaskName().length() > 0) {
+                DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
+                helper.insertTask(task);
+            }
+        }
+    };
+
+    private MapFragment.DeleteTaskListener mDeleteTaskListener = new MapFragment.DeleteTaskListener(){
+
+        @Override
+        public void deleteTask(long id) {
             DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
-            helper.insertTask(task);
+            helper.deleteTask(id);
         }
     };
 
