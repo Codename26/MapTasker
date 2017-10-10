@@ -29,9 +29,10 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String NEW_TASK_KEY = "NewTask";
+    public static final String EDIT_TASK_KEY = "EditTask";
     public static final String TASK_ARRAY = "TaskArray";
     private ArrayList<Task> tasks;
-    TaskEditFragment taskEditFragment;
+    private MapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,18 +56,8 @@ public class MainActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-            MapFragment mapFragment = new MapFragment();
-            DataBaseHelper helper = new DataBaseHelper(this);
-            tasks = helper.getTasks();
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList(TASK_ARRAY, tasks);
-            mapFragment.setArguments(bundle);
-            mapFragment.setDeleteTaskListener(mDeleteTaskListener);
-
-            fm.beginTransaction().add(R.id.fragmentContainer, mapFragment).commit();
-
-            taskEditFragment = new TaskEditFragment();
-            taskEditFragment.setSaveTaskListener(mSaveTaskListener);
+           initMapFragment();
+            fm.beginTransaction().add(R.id.fragmentContainer, mMapFragment).commit();
         }
 
 
@@ -91,9 +82,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -141,9 +129,23 @@ public class MainActivity extends AppCompatActivity
     private TaskEditFragment.SaveTaskListener mSaveTaskListener = new TaskEditFragment.SaveTaskListener() {
         @Override
         public void saveTask(Task task) {
-            if (task.getTaskName().length() > 0) {
-                DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
+            DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
+            if (task.getTaskId() > 0){
+            helper.updateTask(task);
+                initMapFragment();
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.fragmentContainer, mMapFragment);
+                //transaction.addToBackStack(null);
+                transaction.commit();
+            }else if (task.getTaskName().length() > 0) {
                 helper.insertTask(task);
+                initMapFragment();
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.fragmentContainer, mMapFragment);
+                //transaction.addToBackStack(null);
+                transaction.commit();
             }
         }
     };
@@ -156,5 +158,52 @@ public class MainActivity extends AppCompatActivity
             helper.deleteTask(id);
         }
     };
+
+    private MapFragment.CreateTaskListener mCreateTaskListener = new MapFragment.CreateTaskListener(){
+
+        @Override
+        public void createTask(Task task) {
+                TaskEditFragment taskEditFragment = new TaskEditFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(MainActivity.NEW_TASK_KEY, task);
+                taskEditFragment.setArguments(bundle);
+                taskEditFragment.setSaveTaskListener(mSaveTaskListener);
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.fragmentContainer, taskEditFragment);
+                //transaction.addToBackStack(null);
+                transaction.commit();
+        }
+    };
+
+    private MapFragment.EditTaskListener mEditTaskListener = new MapFragment.EditTaskListener(){
+
+        @Override
+        public void editTask(Task task) {
+            TaskEditFragment taskEditFragment = new TaskEditFragment();
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(MainActivity.EDIT_TASK_KEY, task);
+            taskEditFragment.setArguments(bundle);
+            taskEditFragment.setSaveTaskListener(mSaveTaskListener);
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.replace(R.id.fragmentContainer, taskEditFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+
+        }
+    };
+
+    private void initMapFragment(){
+        mMapFragment = new MapFragment();
+        DataBaseHelper helper = new DataBaseHelper(this);
+        tasks = helper.getTasks();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(TASK_ARRAY, tasks);
+        mMapFragment.setArguments(bundle);
+        mMapFragment.setDeleteTaskListener(mDeleteTaskListener);
+        mMapFragment.setCreateTaskListener(mCreateTaskListener);
+        mMapFragment.setEditTaskListener(mEditTaskListener);
+    }
 
 }

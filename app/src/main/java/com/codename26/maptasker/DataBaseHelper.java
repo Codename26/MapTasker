@@ -53,6 +53,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public boolean updateTask(Task task){
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(Task.COLUMN_TASK_NAME, task.getTaskName());
+            values.put(Task.COLUMN_TASK_DESCRIPTION, task.getTaskDescription());
+            values.put(Task.COLUMN_TASK_TAG, task.getTaskTag());
+            values.put(Task.COLUMN_TASK_LATITUDE, task.getTaskLatitude());
+            values.put(Task.COLUMN_TASK_LONGITUDE , task.getTaskLongitude());
+
+            db.update(Task.TABLE_NAME, values, Task.COLUMN_ID + "=" + task.getTaskId(),null);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public long insertTask(Task task){
         long id = 0;
         SQLiteDatabase db = getWritableDatabase();

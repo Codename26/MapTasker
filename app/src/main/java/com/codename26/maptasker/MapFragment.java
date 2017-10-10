@@ -20,8 +20,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -43,6 +45,7 @@ GoogleMap.OnMarkerClickListener {
     boolean longClickPressed = false;
     Snackbar mSnackbar;
     private Task task;
+    private Task newTask;
     private HashMap<Double, Double> coordinates;
     private Menu mMenu;
     ArrayList<Marker> mMarkers;
@@ -83,8 +86,7 @@ GoogleMap.OnMarkerClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+        SupportMapFragment mapFragment  = (SupportMapFragment) this.getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -93,18 +95,10 @@ GoogleMap.OnMarkerClickListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            Fragment taskEditFragment = new TaskEditFragment();
-                DataBaseHelper helper = new DataBaseHelper(getActivity());
-                long id = helper.newTask();
-                Task task = new Task();
-                task.setTaskId(id);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(MainActivity.NEW_TASK_KEY, task);
-                taskEditFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragmentContainer, taskEditFragment);
-                //transaction.addToBackStack(null);
-                transaction.commit();
+                if(mCreateTaskListener != null){
+                    mCreateTaskListener.createTask(newTask);
+                }
+
             }
         });
         return view;
@@ -122,7 +116,9 @@ GoogleMap.OnMarkerClickListener {
                                            if (longClickPressed) {
                                                drawMap();
                                                fab.setVisibility(View.GONE);
-                                               mSnackbar.dismiss();
+                                               if (mSnackbar.isShown()) {
+                                                   mSnackbar.dismiss();
+                                               }
                                                longClickPressed = false;
                                            }
                                            mMenu.findItem(R.id.action_delete).setVisible(false);
@@ -159,12 +155,20 @@ GoogleMap.OnMarkerClickListener {
         }
 
         LatLngBounds.Builder bld = new LatLngBounds.Builder();
-        for (int i = 0; i < tasks.size(); i++) {
-            LatLng ll = new LatLng(tasks.get(i).getTaskLatitude(), tasks.get(i).getTaskLongitude());
-            bld.include(ll);
+        if (tasks.size() > 1) {
+            for (int i = 0; i < tasks.size(); i++) {
+                LatLng ll = new LatLng(tasks.get(i).getTaskLatitude(), tasks.get(i).getTaskLongitude());
+                bld.include(ll);
+            }
+            LatLngBounds bounds = bld.build();
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 230));
         }
-        LatLngBounds bounds = bld.build();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 135));
+        if (tasks.size() == 1){
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(tasks.get(0).getTaskLatitude(),
+                            tasks.get(0).getTaskLongitude()), 15.5f) );
+        } else if (tasks.size() < 1){
+            //Move camera to current location
+        }
     }
 
     @Override
@@ -178,6 +182,7 @@ GoogleMap.OnMarkerClickListener {
                 .strokeColor(Color.argb(153, 117, 200, 242))
                 .fillColor(Color.argb(153, 117, 200, 242)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.5f));
+        newTask = new Task(latLng.latitude, latLng.longitude);
         fab.setVisibility(View.VISIBLE);
         Animation anim = AnimationUtils.loadAnimation(getActivity(), R.anim.appear);
         fab.setAnimation(anim);
@@ -204,19 +209,35 @@ GoogleMap.OnMarkerClickListener {
     }
 
     private DeleteTaskListener mDeleteTaskListener;
+    private CreateTaskListener mCreateTaskListener;
+    private EditTaskListener mEditTaskListener;
     public void setDeleteTaskListener(DeleteTaskListener listener){
         mDeleteTaskListener = listener;
+    }
+
+    public void setCreateTaskListener(CreateTaskListener listener){
+        mCreateTaskListener = listener;
+    }
+
+    public void setEditTaskListener(EditTaskListener listener){
+        mEditTaskListener = listener;
     }
 
     public interface DeleteTaskListener{
         void deleteTask(long id);
     }
 
+    public interface EditTaskListener{
+        void editTask(Task task);
+    }
+
+    public interface CreateTaskListener{
+        void createTask(Task task);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -224,11 +245,16 @@ GoogleMap.OnMarkerClickListener {
         if (id == R.id.action_delete) {
            if (mDeleteTaskListener != null){
                mDeleteTaskListener.deleteTask(task.getTaskId());
+               tasks.remove(task);
                drawMap();
            }
             return true;
         }
         if (id == R.id.action_edit) {
+
+            if(mEditTaskListener != null){
+                mEditTaskListener.editTask(task);
+            }
 
             return true;
         }

@@ -23,6 +23,7 @@ public class TaskEditFragment extends Fragment {
     private Task task;
     private EditText editName;
     private EditText editDescription;
+    private boolean isNewTask = false;
 
 
 
@@ -35,7 +36,12 @@ public class TaskEditFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
-        task = bundle.getParcelable(MainActivity.NEW_TASK_KEY);
+        if (bundle.containsKey(MainActivity.NEW_TASK_KEY)) {
+            task = bundle.getParcelable(MainActivity.NEW_TASK_KEY);
+            isNewTask = true;
+        } else if (bundle.containsKey(MainActivity.EDIT_TASK_KEY)){
+            task = bundle.getParcelable(MainActivity.EDIT_TASK_KEY);
+        }
     }
 
     @Override
@@ -54,17 +60,13 @@ public class TaskEditFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*
-                Fragment mapFragment = new MapFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(MainActivity.NEW_TASK_KEY, task);
-                mapFragment.setArguments(bundle);
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragmentContainer, mapFragment);
-                transaction.commit();
-                */
-if (mListener != null) {
-                    mListener.saveTask(task);
+                if (isNewTask){
+                    task.setTaskId(0);
+                }
+                task.setTaskName(String.valueOf(editName.getText()));
+                task.setTaskDescription(String.valueOf(editDescription.getText()));
+if (mSaveTaskListener != null) {
+    mSaveTaskListener.saveTask(task);
                 }
 
             }
@@ -102,9 +104,11 @@ if (mListener != null) {
         });
     }
 
-    private SaveTaskListener mListener;
+
+    private SaveTaskListener mSaveTaskListener;
+
     public void setSaveTaskListener(SaveTaskListener listener){
-        mListener = listener;
+        mSaveTaskListener = listener;
     }
 
     public interface SaveTaskListener {

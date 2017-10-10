@@ -34,6 +34,11 @@ public class Task implements Parcelable {
         mTaskLongitude = taskLongitude;
     }
 
+    public Task(double taskLatitude, double taskLongitude) {
+        mTaskLatitude = taskLatitude;
+        mTaskLongitude = taskLongitude;
+    }
+
     public String getTaskName() {
         return mTaskName;
     }
