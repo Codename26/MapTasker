@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by Dell on 01.10.2017.
  */
 
-public class Task implements Parcelable {
+public class GeoTask implements Parcelable {
     public static final String TABLE_NAME = "Tasks";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TASK_NAME = "TaskName";
@@ -25,16 +25,16 @@ public class Task implements Parcelable {
     private double mTaskLongitude;
     private long mTaskId;
 
-    public Task() {
+    public GeoTask() {
     }
 
-    public Task(String taskName, double taskLatitude, double taskLongitude) {
+    public GeoTask(String taskName, double taskLatitude, double taskLongitude) {
         mTaskName = taskName;
         mTaskLatitude = taskLatitude;
         mTaskLongitude = taskLongitude;
     }
 
-    public Task(double taskLatitude, double taskLongitude) {
+    public GeoTask(double taskLatitude, double taskLongitude) {
         mTaskLatitude = taskLatitude;
         mTaskLongitude = taskLongitude;
     }
@@ -108,7 +108,7 @@ public class Task implements Parcelable {
         dest.writeLong(this.mTaskId);
     }
 
-    protected Task(Parcel in) {
+    protected GeoTask(Parcel in) {
         this.mTaskName = in.readString();
         this.mTaskDescription = in.readString();
         this.mTaskTag = in.readString();
@@ -117,15 +117,15 @@ public class Task implements Parcelable {
         this.mTaskId = in.readLong();
     }
 
-    public static final Creator<Task> CREATOR = new Creator<Task>() {
+    public static final Creator<GeoTask> CREATOR = new Creator<GeoTask>() {
         @Override
-        public Task createFromParcel(Parcel source) {
-            return new Task(source);
+        public GeoTask createFromParcel(Parcel source) {
+            return new GeoTask(source);
         }
 
         @Override
-        public Task[] newArray(int size) {
-            return new Task[size];
+        public GeoTask[] newArray(int size) {
+            return new GeoTask[size];
         }
     };
 }

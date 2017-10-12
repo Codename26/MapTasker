@@ -15,13 +15,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + Task.TABLE_NAME + "("
-                + Task.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + Task.COLUMN_TASK_NAME + " TEXT NOT NULL,"
-                + Task.COLUMN_TASK_DESCRIPTION + " TEXT,"
-                + Task.COLUMN_TASK_TAG + " TEXT,"
-                + Task.COLUMN_TASK_LATITUDE + " REAL NOT NULL,"
-                + Task.COLUMN_TASK_LONGITUDE + " REAL NOT NULL);");
+        sqLiteDatabase.execSQL("CREATE TABLE " + com.codename26.maptasker.GeoTask.TABLE_NAME + "("
+                + com.codename26.maptasker.GeoTask.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME + " TEXT NOT NULL,"
+                + com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION + " TEXT,"
+                + com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG + " TEXT,"
+                + com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE + " REAL NOT NULL,"
+                + com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE + " REAL NOT NULL);");
 
         fillDB(sqLiteDatabase);
 
@@ -33,18 +33,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         try {
             for (int i = 0; i < 4; i++) {
                 ContentValues values = new ContentValues();
-                values.put(Task.COLUMN_TASK_NAME, "Task " + i );
-                values.put(Task.COLUMN_TASK_DESCRIPTION, "Desc " + i );
-                values.put(Task.COLUMN_TASK_TAG, "Tag " + i );
-                values.put(Task.COLUMN_TASK_LATITUDE, latArray[i]);
-                values.put(Task.COLUMN_TASK_LONGITUDE , lonArray[i]);
+                values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME, "GeoTask " + i );
+                values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION, "Desc " + i );
+                values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG, "Tag " + i );
+                values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE, latArray[i]);
+                values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE , lonArray[i]);
 
-                sqLiteDatabase.insert(Task.TABLE_NAME, null, values);
+                sqLiteDatabase.insert(com.codename26.maptasker.GeoTask.TABLE_NAME, null, values);
             }
         }catch (Exception e) {
             e.printStackTrace();
         }
-
+        sqLiteDatabase.close();
 
     }
 
@@ -53,40 +53,42 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean updateTask(Task task){
+    public boolean updateTask(GeoTask geoTask){
         SQLiteDatabase db = getWritableDatabase();
         try {
             ContentValues values = new ContentValues();
-            values.put(Task.COLUMN_TASK_NAME, task.getTaskName());
-            values.put(Task.COLUMN_TASK_DESCRIPTION, task.getTaskDescription());
-            values.put(Task.COLUMN_TASK_TAG, task.getTaskTag());
-            values.put(Task.COLUMN_TASK_LATITUDE, task.getTaskLatitude());
-            values.put(Task.COLUMN_TASK_LONGITUDE , task.getTaskLongitude());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME, geoTask.getTaskName());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION, geoTask.getTaskDescription());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG, geoTask.getTaskTag());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE, geoTask.getTaskLatitude());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE , geoTask.getTaskLongitude());
 
-            db.update(Task.TABLE_NAME, values, Task.COLUMN_ID + "=" + task.getTaskId(),null);
+            db.update(com.codename26.maptasker.GeoTask.TABLE_NAME, values, com.codename26.maptasker.GeoTask.COLUMN_ID + "=" + geoTask.getTaskId(),null);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        db.close();
 
         return false;
     }
 
-    public long insertTask(Task task){
+    public long insertTask(GeoTask geoTask){
         long id = 0;
         SQLiteDatabase db = getWritableDatabase();
         try {
             ContentValues values = new ContentValues();
-            values.put(Task.COLUMN_TASK_NAME, task.getTaskName());
-            values.put(Task.COLUMN_TASK_DESCRIPTION, task.getTaskDescription());
-            values.put(Task.COLUMN_TASK_TAG, task.getTaskTag());
-            values.put(Task.COLUMN_TASK_LATITUDE, task.getTaskLatitude());
-            values.put(Task.COLUMN_TASK_LONGITUDE , task.getTaskLongitude());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME, geoTask.getTaskName());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION, geoTask.getTaskDescription());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG, geoTask.getTaskTag());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE, geoTask.getTaskLatitude());
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE , geoTask.getTaskLongitude());
 
-            id = db.insert(Task.TABLE_NAME, null, values);
+            id = db.insert(com.codename26.maptasker.GeoTask.TABLE_NAME, null, values);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        db.close();
 
         return id;
     }
@@ -96,36 +98,37 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         try {
             ContentValues values = new ContentValues();
-            values.put(Task.COLUMN_TASK_NAME, "");
-            values.put(Task.COLUMN_TASK_DESCRIPTION, "");
-            values.put(Task.COLUMN_TASK_TAG, "");
-            values.put(Task.COLUMN_TASK_LATITUDE, 0);
-            values.put(Task.COLUMN_TASK_LONGITUDE , 0);
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME, "");
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION, "");
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG, "");
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE, 0);
+            values.put(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE , 0);
 
-            id = db.insert(Task.TABLE_NAME, null, values);
+            id = db.insert(com.codename26.maptasker.GeoTask.TABLE_NAME, null, values);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        db.close();
 
         return id;
     }
 
-    public Task getTask(long id){
+    public GeoTask getTask(long id){
         SQLiteDatabase db = getWritableDatabase();
-        Task task = new Task();
+        GeoTask geoTask = new GeoTask();
         Cursor cursor = null;
 
         try {
-            cursor = db.query(Task.TABLE_NAME, null, Task.COLUMN_ID + "=" + id, null, null, null, null);
+            cursor = db.query(com.codename26.maptasker.GeoTask.TABLE_NAME, null, com.codename26.maptasker.GeoTask.COLUMN_ID + "=" + id, null, null, null, null);
 
             if (cursor.moveToFirst()) {
 
-                    task.setTaskId(cursor.getLong(cursor.getColumnIndex(Task.COLUMN_ID)));
-                    task.setTaskName(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_NAME)));
-                    task.setTaskDescription(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_DESCRIPTION)));
-                    task.setTaskTag(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_TAG)));
-                    task.setTaskLatitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LATITUDE)));
-                    task.setTaskLongitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LONGITUDE)));
+                    geoTask.setTaskId(cursor.getLong(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_ID)));
+                    geoTask.setTaskName(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME)));
+                    geoTask.setTaskDescription(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION)));
+                    geoTask.setTaskTag(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG)));
+                    geoTask.setTaskLatitude(cursor.getDouble(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE)));
+                    geoTask.setTaskLongitude(cursor.getDouble(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,30 +136,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
+            db.close();
         }
 
-        return task;
+        return geoTask;
     }
 
-    public ArrayList<Task> getTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
+    public ArrayList<GeoTask> getTasks() {
+        ArrayList<GeoTask> geoTasks = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = null;
 
         try {
-            cursor = db.query(Task.TABLE_NAME, null, null, null, null, null, null);
+            cursor = db.query(com.codename26.maptasker.GeoTask.TABLE_NAME, null, null, null, null, null, null);
 
             if (cursor.moveToFirst()) {
                 while (!cursor.isAfterLast()) {
-                    Task task = new Task();
+                    GeoTask geoTask = new GeoTask();
 
-                    task.setTaskId(cursor.getLong(cursor.getColumnIndex(Task.COLUMN_ID)));
-                    task.setTaskName(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_NAME)));
-                    task.setTaskDescription(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_DESCRIPTION)));
-                    task.setTaskTag(cursor.getString(cursor.getColumnIndex(Task.COLUMN_TASK_TAG)));
-                    task.setTaskLatitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LATITUDE)));
-                    task.setTaskLongitude(cursor.getDouble(cursor.getColumnIndex(Task.COLUMN_TASK_LONGITUDE)));
-                    tasks.add(task);
+                    geoTask.setTaskId(cursor.getLong(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_ID)));
+                    geoTask.setTaskName(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_NAME)));
+                    geoTask.setTaskDescription(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_DESCRIPTION)));
+                    geoTask.setTaskTag(cursor.getString(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_TAG)));
+                    geoTask.setTaskLatitude(cursor.getDouble(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_LATITUDE)));
+                    geoTask.setTaskLongitude(cursor.getDouble(cursor.getColumnIndex(com.codename26.maptasker.GeoTask.COLUMN_TASK_LONGITUDE)));
+                    geoTasks.add(geoTask);
                     cursor.moveToNext();
                 }
             }
@@ -166,8 +170,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
+            db.close();
         }
-        return tasks;
+        return geoTasks;
     }
 
     public boolean deleteTask(long id) {
@@ -175,10 +180,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         try {
-            count = db.delete(Task.TABLE_NAME, Task.COLUMN_ID + "=" + id, null);
+            count = db.delete(com.codename26.maptasker.GeoTask.TABLE_NAME, com.codename26.maptasker.GeoTask.COLUMN_ID + "=" + id, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        db.close();
 
         return count > 0;
     }

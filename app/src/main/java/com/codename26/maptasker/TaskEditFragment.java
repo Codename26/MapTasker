@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import android.widget.Spinner;
  */
 public class TaskEditFragment extends Fragment {
     private FloatingActionButton fab;
-    private Task task;
+    private GeoTask mGeoTask;
     private EditText editName;
     private EditText editDescription;
     private boolean isNewTask = false;
@@ -37,10 +36,10 @@ public class TaskEditFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle.containsKey(MainActivity.NEW_TASK_KEY)) {
-            task = bundle.getParcelable(MainActivity.NEW_TASK_KEY);
+            mGeoTask = bundle.getParcelable(MainActivity.NEW_TASK_KEY);
             isNewTask = true;
         } else if (bundle.containsKey(MainActivity.EDIT_TASK_KEY)){
-            task = bundle.getParcelable(MainActivity.EDIT_TASK_KEY);
+            mGeoTask = bundle.getParcelable(MainActivity.EDIT_TASK_KEY);
         }
     }
 
@@ -61,12 +60,12 @@ public class TaskEditFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (isNewTask){
-                    task.setTaskId(0);
+                    mGeoTask.setTaskId(0);
                 }
-                task.setTaskName(String.valueOf(editName.getText()));
-                task.setTaskDescription(String.valueOf(editDescription.getText()));
+                mGeoTask.setTaskName(String.valueOf(editName.getText()));
+                mGeoTask.setTaskDescription(String.valueOf(editDescription.getText()));
 if (mSaveTaskListener != null) {
-    mSaveTaskListener.saveTask(task);
+    mSaveTaskListener.saveTask(mGeoTask);
                 }
 
             }
@@ -76,9 +75,9 @@ if (mSaveTaskListener != null) {
     private void initViews(View view) {
         editName = view.findViewById(R.id.editName);
         editDescription = view.findViewById(R.id.editDescription);
-        if (task.getTaskName() != null){
-            editName.setText(task.getTaskName());
-            editDescription.setText((task.getTaskDescription()));
+        if (mGeoTask.getTaskName() != null){
+            editName.setText(mGeoTask.getTaskName());
+            editDescription.setText((mGeoTask.getTaskDescription()));
         }
     }
 
@@ -112,7 +111,7 @@ if (mSaveTaskListener != null) {
     }
 
     public interface SaveTaskListener {
-       void saveTask(Task task);
+       void saveTask(GeoTask geoTask);
     }
 
 }
