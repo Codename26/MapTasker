@@ -1,10 +1,14 @@
 package com.codename26.maptasker;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-
+        //Init and show Map Fragment
         FragmentManager fm = getSupportFragmentManager();
         if (findViewById(R.id.fragmentContainer) != null) {
             if (savedInstanceState != null) {
@@ -92,21 +96,26 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    //Manually start/stop service from app menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
+        //Manually start Locatiion Listener Service
         if (id == R.id.action_startService) {
             Intent startIntent = new Intent(getApplicationContext(), GPSTaskService.class);
             startService(startIntent);
             return true;
         }
+        //Manually stop Locatiion Listener Service
         if (id == R.id.action_stopService) {
             Intent stopIntent = new Intent(getApplicationContext(), GPSTaskService.class);
             stopService(stopIntent);
             return true;
         }
+/*        if (id == R.id.action_notification) {
+            createNotification();
+            return true;
+        }*/
      /*   if (id == R.id.action_delete) {
             Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
             return true;
@@ -280,18 +289,38 @@ public class MainActivity extends AppCompatActivity
             System.out.println("Calculating distance");
             if (distanceInMeters <= 200) {
                 System.out.println("Distance to marker is " + distanceInMeters + "******************");
+                if (mGeoTasks.get(i).getTaskNotification() < 1){
+                    createNotification(mGeoTasks.get(i));
+                }
             }
         }
     }
 
-   /* @Override
-    public void onPause() {
-        super.onPause();
-        System.out.println("fragment On Pause");
-        if (mBroadcastReceiver != null){
-            unregisterReceiver(mBroadcastReceiver);
-        }
-    }*/
+    private void createNotification(GeoTask geoTask) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // Строим уведомление
+        Notification builder = new Notification.Builder(this)
+                .setTicker(geoTask.getTaskName())
+                .setContentTitle(geoTask.getTaskName())
+                .setContentText(
+                        geoTask.getTaskDescription())
+                .setSmallIcon(R.mipmap.ic_launcher).setContentIntent(pIntent)
+                .addAction(R.mipmap.ic_launcher, "Open", pIntent)
+                .build();
+
+        // убираем уведомление, когда его выбрали
+        builder.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        notificationManager.notify(0, builder);
+        geoTask.setTaskNotification(1);
+        DataBaseHelper helper = new DataBaseHelper(MainActivity.this);
+            helper.updateTask(geoTask);
+
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -299,6 +328,8 @@ public class MainActivity extends AppCompatActivity
          if (mBroadcastReceiver != null){
             unregisterReceiver(mBroadcastReceiver);
         }
+        Intent stopIntent = new Intent(getApplicationContext(), GPSTaskService.class);
+        stopService(stopIntent);
     }
 
 }

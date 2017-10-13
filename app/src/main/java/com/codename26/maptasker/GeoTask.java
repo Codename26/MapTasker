@@ -15,6 +15,7 @@ public class GeoTask implements Parcelable {
     public static final String COLUMN_TASK_LATITUDE = "TaskLatitude";
     public static final String COLUMN_TASK_LONGITUDE = "TaskLongitude";
     public static final String COLUMN_TASK_TAG = "TaskTag";
+    public static final String COLUMN_TASK_NOTIFICATION = "TaskNotification";
 
 
 
@@ -24,6 +25,7 @@ public class GeoTask implements Parcelable {
     private double mTaskLatitude;
     private double mTaskLongitude;
     private long mTaskId;
+    private int mTaskNotification;
 
     public GeoTask() {
     }
@@ -87,6 +89,14 @@ public class GeoTask implements Parcelable {
         mTaskId = taskId;
     }
 
+    public int getTaskNotification() {
+        return mTaskNotification;
+    }
+
+    public void setTaskNotification(int taskNotification) {
+        mTaskNotification = taskNotification;
+    }
+
     public String toString(){
         return String.format("Name = %s, Desc = %s, Latitude = %f, Longitude = %f",
                 mTaskName, mTaskDescription, mTaskLatitude, mTaskLongitude);
@@ -106,6 +116,7 @@ public class GeoTask implements Parcelable {
         dest.writeDouble(this.mTaskLatitude);
         dest.writeDouble(this.mTaskLongitude);
         dest.writeLong(this.mTaskId);
+        dest.writeInt(this.mTaskNotification);
     }
 
     protected GeoTask(Parcel in) {
@@ -115,6 +126,7 @@ public class GeoTask implements Parcelable {
         this.mTaskLatitude = in.readDouble();
         this.mTaskLongitude = in.readDouble();
         this.mTaskId = in.readLong();
+        this.mTaskNotification = in.readInt();
     }
 
     public static final Creator<GeoTask> CREATOR = new Creator<GeoTask>() {
